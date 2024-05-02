@@ -1,66 +1,80 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Imgui">
+    <Filter Include="Engine">
+      <UniqueIdentifier>{a631cd79-84f9-4c31-9d26-0cea91f1ce6e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Rendering">
+      <UniqueIdentifier>{7bb9f8d7-f778-4b22-bb6d-692c28f236cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Main">
+      <UniqueIdentifier>{26bc78ef-48c2-425a-a960-a02f8b4fb1a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Imgui">
       <UniqueIdentifier>{bc0a3da1-abc3-4851-ad5c-cd32fc34d31f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine\Rendering\Shaders">
+      <UniqueIdentifier>{9bfc4a40-1b0f-48bf-b64a-074271c209db}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="glad.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="imgui\imgui.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>Engine\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_demo.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>Engine\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_draw.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>Engine\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_tables.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>Engine\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\imgui_widgets.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>Engine\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\backends\imgui_impl_glfw.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>Engine\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="imgui\backends\imgui_impl_opengl3.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>Engine\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="Renderer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Engine\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Main</Filter>
+    </ClCompile>
+    <ClCompile Include="glad.c">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imgui.h">
-      <Filter>Imgui</Filter>
+      <Filter>Engine\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="imgui\backends\imgui_impl_glfw.h">
-      <Filter>Imgui</Filter>
+      <Filter>Engine\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="imgui\backends\imgui_impl_opengl3.h">
-      <Filter>Imgui</Filter>
+      <Filter>Engine\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="Renderer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Engine\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="Shader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Lit.frag">
+      <Filter>Engine\Rendering\Shaders</Filter>
+    </None>
+    <None Include="Lit.vert">
+      <Filter>Engine\Rendering\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
