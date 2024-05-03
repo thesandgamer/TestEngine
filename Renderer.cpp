@@ -5,6 +5,8 @@
 
 #include "stb_image.h"
 
+#include "glm/glm.hpp"
+
 void Renderer::init()
 {
 	shader_ = std::make_unique<Shader>("Lit.vert", "Lit.frag");
