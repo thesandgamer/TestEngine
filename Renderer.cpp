@@ -5,22 +5,24 @@
 
 #include "stb_image.h"
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 void Renderer::init()
 {
 	shader_ = std::make_unique<Shader>("Lit.vert", "Lit.frag");
 	//Points
 	float vertices[] = {
-		// positions          // colors           // texture coords
-		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
+		// positions          // texture coords
+		 0.5f,  0.5f, 0.0f,   1.0f, 1.0f, // top right
+		 0.5f, -0.5f, 0.0f,   1.0f, 0.0f, // bottom right
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, // bottom left
+		-0.5f,  0.5f, 0.0f,   0.0f, 1.0f  // top left 
 	};
 	unsigned int indices[] = {
-	   0, 1, 3, // first triangle
-	   1, 2, 3  // second triangle
+		0, 1, 3, // first triangle
+		1, 2, 3  // second triangle
 	};
 
 
@@ -40,15 +42,12 @@ void Renderer::init()
 
 	// Set la façon dont opengl va lire les données stoquées
 
-	//Ici pour les données stoque dans le premier index(les positions)
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-	//Et ici pour les couleurs
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	// texture coord attribute
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
-	//Et ici pour la texture
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	glEnableVertexAttribArray(2);
 
 
 	//-----------------------------Texture------------------
@@ -117,10 +116,21 @@ void Renderer::init()
 	// tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
 	// -------------------------------------------------------------------------------------------
 	shader_->use(); // don't forget to activate/use the shader before setting uniforms!
-	// either set it manually like so:
-	glUniform1i(glGetUniformLocation(shader_->ID, "texture1"), 0);
-	// or set it via the texture class
+	shader_->setInt("texture", 0);
 	shader_->setInt("texture2", 1);
+
+
+
+	//-------------Transform-------
+		//Les opérations de matrice se font dans l'ordre inverse, on met en dernier ce qui se fait en premier(faire la scale en premier sinon ça va scale les autre modifications)
+		//Pour la rotation tourner autour d'un axe normalisé
+	
+	glm::mat4 trans = glm::mat4(1.0f);	//Créer une matrice de transform vide à 1
+	trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));	//On applique une rotation de 90° sur l'axe Z
+	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));	//On y applique une scale de .5 sur chaque axe (se fait avant la rotation)
+	//On passe la matrice de transoformation  au shader
+	unsigned int transformLoc = glGetUniformLocation(shader_->ID, "transform");
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
 }
 
@@ -139,8 +149,13 @@ void Renderer::draw()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture2);
 
-	// render container
+
+
+
+	//Use shader
 	shader_->use();
+
+
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
