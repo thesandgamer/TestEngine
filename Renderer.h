@@ -29,6 +29,7 @@ private:
 	unsigned int shader_program_;
 
 	unsigned int texture;
+	unsigned int texture2;
 
 
 	std::unique_ptr<Shader> shader_;
