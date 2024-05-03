@@ -18,15 +18,17 @@ Renderer renderer;
 
 int main(int, char**)
 {
+    //On initialise GLFW
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 #ifdef __APPLE__
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 #endif
 
-
+    //Créer la fenêtre
     GLFWwindow* window = glfwCreateWindow(1920, 1080, "TestEngine", NULL, NULL);
     if (window == NULL)
     {
@@ -34,14 +36,19 @@ int main(int, char**)
         glfwTerminate();
         return -1;
     }
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    //Set le contexte et initlise glad
+    glfwMakeContextCurrent(window);
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
         std::cout << "Failed to initialize GLAD" << std::endl;
         return -1;
     }
+
+    //Pour pouvoir resize la fenêtre
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+   
 
 
     // Setup Dear ImGui context
@@ -107,6 +114,8 @@ int main(int, char**)
 
    
     }
+
+    renderer.end();
 
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();

@@ -12,9 +12,12 @@ enum RenderMode
 class Renderer
 {
 public:
+	Renderer() = default;
+
 	void init();
 	void update(float dt);
 	void draw();
+	void end();
 
 	void set_render_mode(RenderMode n_mode) { render_mode_ = n_mode; }
 
@@ -25,7 +28,10 @@ private:
 
 	unsigned int shader_program_;
 
-	Shader shader_{"Lit.vert", "Lit.frag"};
+	unsigned int texture;
+
+
+	std::unique_ptr<Shader> shader_;
 
 	RenderMode render_mode_ = Flat;
 

@@ -53,6 +53,9 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="stb_image.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imgui.h">
@@ -68,6 +71,9 @@
       <Filter>Engine\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="Shader.h" />
+    <ClInclude Include="stb_image.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Lit.frag">

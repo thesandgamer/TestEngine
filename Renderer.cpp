@@ -2,107 +2,90 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+
+#include "stb_image.h"
+
 void Renderer::init()
 {
+	shader_ = std::make_unique<Shader>("Lit.vert", "Lit.frag");
 	//Points
 	float vertices[] = {
-		 0.5f,  0.5f, 0.0f,  // top right
-		 0.5f, -0.5f, 0.0f,  // bottom right
-		-0.5f, -0.5f, 0.0f,  // bottom left
-		-0.5f,  0.5f, 0.0f   // top left 
+		// positions          // colors           // texture coords
+		 0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+		 0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+		-0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+		-0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
 	};
-	unsigned int indices[] = {  // note that we start from 0!
-		0, 1, 3,   // first triangle
-		1, 2, 3    // second triangle
+	unsigned int indices[] = {
+	   0, 1, 3, // first triangle
+	   1, 2, 3  // second triangle
 	};
 
-	//-----------------Vertex buffer
-	glGenBuffers(1, &VBO);	//On Génère le buffer à l'ID
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);		//Et on bind ce buffer dans GL_ARRAY_BUFFER
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW); //Copie les données dans le buffer
-	//--------------------------
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	//-----------------Shader---------
-	/*
-	const char* vertexShaderSource = "#version 330 core\n"
-		"layout (location = 0) in vec3 aPos;\n"
-		"out vec4 vertexColor; \n"
-		"void main()\n"
-		"{\n"
-		"   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-		"	vertexColor = vec4(0.5, 0.0, 0.0, 1.0);\n"
-		"}\0";
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
-
-	glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-	glCompileShader(vertexShader);
-
-	int  success;
-	char infoLog[512];
-	glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	const char* fragmentShaderSource = "#version 330 core\n"
-		"out vec4 FragColor;\n"
-		"in vec4 vertexColor;"
-		"void main()\n"
-		"{\n"
-		"   FragColor = vertexColor;\n"
-		"}\n\0";
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-	glCompileShader(fragmentShader);
-
-	glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-	if (!success)
-	{
-		glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	//-----------------Shader Program---------
-	shader_program_ = glCreateProgram();
-	glAttachShader(shader_program_, vertexShader);
-	glAttachShader(shader_program_, fragmentShader);
-	glLinkProgram(shader_program_);
-
-	glGetProgramiv(shader_program_, GL_LINK_STATUS, &success);
-	if (!success) {
-		glGetProgramInfoLog(shader_program_, 512, NULL, infoLog);
-		std::cout << "ERROR::SHADER::PROGRAM::COMPILATION_FAILED\n" << infoLog << std::endl;
-	}
-
-	glUseProgram(shader_program_);
-	glDeleteShader(vertexShader);
-	glDeleteShader(fragmentShader);*/
-
-	//--------------------------------------------------------------------
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-	glEnableVertexAttribArray(0);
 
 	//----------------------------------------------------------------------------------
-	glGenVertexArrays(1, &VAO);
+	glGenVertexArrays(1, &VAO);	//Génère le vertex array object
+	glGenBuffers(1, &VBO);	//Génère vertex buffer object
+	glGenBuffers(1, &EBO);	//Génère l'Element buffer object
 
-	// 1. bind Vertex Array Object
-	glBindVertexArray(VAO);
+	glBindVertexArray(VAO);	//On bind le VAO	
 	// 2. copy our vertices array in a vertex buffer for OpenGL to use
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-	// 3. copy our index array in a element buffer for OpenGL to use
+
+	//Pareil pour l'EBO
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	// 4. then set the vertex attributes pointers
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	// Set la façon dont opengl va lire les données stoquées
+
+	//Ici pour les données stoque dans le premier index(les positions)
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	//Et ici pour les couleurs
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
+	//Et ici pour la texture
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	glEnableVertexAttribArray(2);
+
+
+	//-----------------------------Texture------------------
+//Génère la texture
+	glGenTextures(1, &texture);//Combien de texture on veut créer et où on les stoques
+	glBindTexture(GL_TEXTURE_2D, texture);//On bind la texture
+
+	//Set paramètres
+//Set les options pour les coordonées de texture quand sort de la range
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//en U
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//en V
+	//On va set la méthode d'interpolation des pixels(quand upscale ou downscale): nearest pixelise, linear blur
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//Création des options pour les mipmaps 
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	/* //Si on veut utiliser Clamp to border
+	float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
+	glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+	*/
+
+	//Load image grâce à stb image
+	int width, height, nrChannels;
+	unsigned char* data = stbi_load("resources/textures/container.jpg", &width, &height, &nrChannels, 0);
+
+	if (data)
+	{
+		//On génère la texture à partir de l'image loadé
+		//			Target de la texture/niveau de mipmap/Format de l'image/wid...   / doit être 0/format    / data type           / data de l'image
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);	//Génère les mip maps pour la texture
+	}
+	else
+	{
+		std::cout << "ERROR::TEXTURE of type: " << "Failed to load texture" << " Error can come from an incorrect path"<< "\n -- --------------------------------------------------- -- " << std::endl;
+	}
+	//On libère l'image de la mémoire
+	stbi_image_free(data);
 
 
 }
@@ -115,12 +98,20 @@ void Renderer::update(float dt)
 
 void Renderer::draw()
 {
-	//Draw object
-	shader_.use();
 
+	// bind Texture
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	// render container
+	shader_->use();
 	glBindVertexArray(VAO);
-	glPolygonMode(GL_FRONT_AND_BACK, render_mode_ ? GL_LINE :  GL_FILL );
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
 
+}
+
+void Renderer::end()
+{
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 }
