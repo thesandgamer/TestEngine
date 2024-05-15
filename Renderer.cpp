@@ -121,16 +121,7 @@ void Renderer::init()
 
 
 
-	//-------------Transform-------
-		//Les opérations de matrice se font dans l'ordre inverse, on met en dernier ce qui se fait en premier(faire la scale en premier sinon ça va scale les autre modifications)
-		//Pour la rotation tourner autour d'un axe normalisé
-	
-	glm::mat4 trans = glm::mat4(1.0f);	//Créer une matrice de transform vide à 1
-	trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));	//On applique une rotation de 90° sur l'axe Z
-	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));	//On y applique une scale de .5 sur chaque axe (se fait avant la rotation)
-	//On passe la matrice de transoformation  au shader
-	unsigned int transformLoc = glGetUniformLocation(shader_->ID, "transform");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+
 
 }
 
@@ -150,10 +141,22 @@ void Renderer::draw()
 	glBindTexture(GL_TEXTURE_2D, texture2);
 
 
+	glm::mat4 trans = glm::mat4(1.0f);	//Créer une matrice de transform vide à 1
+	//-------------Transform-------
+	//Les opérations de matrice se font dans l'ordre inverse, on met en dernier ce qui se fait en premier(faire la scale en premier sinon ça va scale les autre modifications)
+	//Pour la rotation tourner autour d'un axe normalisé
+	trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f)); //On applique une translation à la matrice									//S'effectue en troisème
+	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));	//On applique une rotation de 90° sur l'axe Z	//S'effectue en deuxième
+	trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));	//On y applique une scale de .5 sur chaque axe (se fait avant la rotation)			//S'effectue en premier
 
 
 	//Use shader
 	shader_->use();
+
+	//On passe la matrice de transoformation  au shader
+	unsigned int transformLoc = glGetUniformLocation(shader_->ID, "transform");
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
 
 	glBindVertexArray(VAO);

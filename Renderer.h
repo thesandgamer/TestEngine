@@ -32,6 +32,7 @@ private:
 	unsigned int texture2;
 
 
+
 	std::unique_ptr<Shader> shader_;
 
 	RenderMode render_mode_ = Flat;
