@@ -120,8 +120,18 @@ void Renderer::init()
 	shader_->setInt("texture2", 1);
 
 
+	//-----------Model matrix/transform
+	model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
+	//-----------View
+	//Bouger la caméra c'est comme bouger le monde entier
+	// note that we're translating the scene in the reverse direction of where we want to move
+	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
 
+	//-----------Projection
+	projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	unsigned int projectionLoc = glGetUniformLocation(shader_->ID, "projection");
+	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
 }
 
@@ -143,20 +153,33 @@ void Renderer::draw()
 
 	glm::mat4 trans = glm::mat4(1.0f);	//Créer une matrice de transform vide à 1
 	//-------------Transform-------
-	//Les opérations de matrice se font dans l'ordre inverse, on met en dernier ce qui se fait en premier(faire la scale en premier sinon ça va scale les autre modifications)
+	//		L'idée est de créer une matrice de transformations à laquel on va appliquer des transformations(rotation, translation, scale) et qu'on va ensuite injecter au shader pour faire bouger nos vertexes
+
+	//Les opérations de matrices se font dans l'ordre inverse, on met en dernier ce qui se fait en premier(faire la scale en premier sinon ça va scale les autre modifications)
+	trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f)); //On applique une translation à la matrice				//S'effectue en troisème
+
 	//Pour la rotation tourner autour d'un axe normalisé
-	trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f)); //On applique une translation à la matrice									//S'effectue en troisème
-	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));	//On applique une rotation de 90° sur l'axe Z	//S'effectue en deuxième
-	trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));	//On y applique une scale de .5 sur chaque axe (se fait avant la rotation)			//S'effectue en premier
+	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));	//On applique une rotation de 90° sur l'axe Z	
+	trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));											//S'effectue en deuxième
+
+	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));	//On y applique une scale de .5 sur chaque axe 					//S'effectue en premier
 
 
 	//Use shader
 	shader_->use();
 
-	//On passe la matrice de transoformation  au shader
+	//On passe la matrice de transformation  au shader
+	/*
 	unsigned int transformLoc = glGetUniformLocation(shader_->ID, "transform");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));*/
+
+	unsigned int modelLoc = glGetUniformLocation(shader_->ID, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	unsigned int viewLoc = glGetUniformLocation(shader_->ID, "view");
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+
+
 
 
 	glBindVertexArray(VAO);

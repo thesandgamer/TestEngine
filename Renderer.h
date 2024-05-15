@@ -31,7 +31,9 @@ private:
 	unsigned int texture;
 	unsigned int texture2;
 
-
+	glm::mat4 model = glm::mat4(1.0f);
+	glm::mat4 view = glm::mat4(1.0f);
+	glm::mat4 projection;
 
 	std::unique_ptr<Shader> shader_;
 
