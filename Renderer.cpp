@@ -164,11 +164,15 @@ void Renderer::init()
 	//Bouger la caméra c'est comme bouger le monde entier
 	// note that we're translating the scene in the reverse direction of where we want to move
 	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	//Bind dans le shader
+	shader_->setMat4("view", view);
+
 
 //-----------Projection
 	projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-	unsigned int projectionLoc = glGetUniformLocation(shader_->ID, "projection");
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
+	//Bind dans le shader
+	shader_->setMat4("projection", projection);
+
 
 }
 
@@ -193,28 +197,42 @@ void Renderer::draw()
 	shader_->use();
 
 	//Reset la matrice du model car on va en changer les valeurs
-	model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
+	//model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
 
 //-------------Transform-------
 	//		L'idée est de modifier la matrice du model(local transfrom) sur laquel on va appliquer des transformations(rotation, translation, scale) et qu'on va ensuite injecter au shader pour faire bouger nos vertexes
 	//Les opérations de matrices se font dans l'ordre inverse, on met en dernier ce qui se fait en premier(faire la scale en premier sinon ça va scale les autre modifications)
 
 	//Pour la rotation tourner autour d'un axe normalisé
+	/*
 	model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
+	model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));*/
 
 	//On passe les matrices de transformation  au shader
-	unsigned int modelLoc = glGetUniformLocation(shader_->ID, "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-	unsigned int viewLoc = glGetUniformLocation(shader_->ID, "view");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-
+	shader_->setMat4("model", model);
 
 
 
 	glBindVertexArray(VAO);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	//L'idée c'est qu'on a un array qui va stoquer des positions auquelles sont censé être nos cubes(tous les mêmes)
+	//Pour chaque cube on va set le shader avec les informations de transform du cube puis on va dessiner
+	//Ca va donc dessiner le cube en fonction de ce qu'on à mis dans le shader
+	for (unsigned int i = 0; i < 10; i++)
+	{
+		glm::mat4 model = glm::mat4(1.0f);
+		model = glm::translate(model, cubePositions[i]);
+		float angle = 20.0f * i;
+		//model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f*i, 0.0f));
+		model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5)); 
+		shader_->setMat4("model", model);
+
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
+
+
 
 }
 
