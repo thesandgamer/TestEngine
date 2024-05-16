@@ -187,23 +187,12 @@ void Renderer::draw()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture2);
 
-	/*
-	glm::mat4 trans = glm::mat4(1.0f);	//Créer une matrice de transform vide à 1
-	
-	trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f)); //On applique une translation à la matrice				//S'effectue en troisème
-
-	//Pour la rotation tourner autour d'un axe normalisé
-	//trans = glm::rotate(trans, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));	//On applique une rotation de 90° sur l'axe Z	
-	trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));											//S'effectue en deuxième
-
-	trans = glm::scale(trans, glm::vec3(0.5, 0.5, 0.5));	//On y applique une scale de .5 sur chaque axe 					//S'effectue en premier
-	*/
-
 
 
 	//Use shader
 	shader_->use();
 
+	//Reset la matrice du model car on va en changer les valeurs
 	model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
 
 //-------------Transform-------
@@ -212,12 +201,9 @@ void Renderer::draw()
 
 	//Pour la rotation tourner autour d'un axe normalisé
 	model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
 
-	//On passe la matrice de transformation  au shader
-	/*
-	unsigned int transformLoc = glGetUniformLocation(shader_->ID, "transform");
-	glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));*/
-
+	//On passe les matrices de transformation  au shader
 	unsigned int modelLoc = glGetUniformLocation(shader_->ID, "model");
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
