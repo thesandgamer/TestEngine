@@ -48,7 +48,7 @@ int main(int, char**)
     //Pour pouvoir resize la fenêtre
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-   
+    glEnable(GL_DEPTH_TEST);
 
 
     // Setup Dear ImGui context
@@ -92,7 +92,8 @@ int main(int, char**)
 
          //-------------------------DRAWING
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);   //Change la couleur de clean de l'écran
-        glClear(GL_COLOR_BUFFER_BIT);   //Clean l'écran avec la couleur 
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);   //Clean l'écran avec la couleur 
 
 
         //Draw objects here
