@@ -161,9 +161,9 @@ void Renderer::init()
 	//model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
 //-----------View
-	//Bouger la caméra c'est comme bouger le monde entier
+	//Bouger la caméra c'est comme bouger le monde entier, du coup il faut bouger avec des valeurs inverses le monde
 	// note that we're translating the scene in the reverse direction of where we want to move
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	view = glm::lookAt(cameraPos,cameraTarget,up);
 	//Bind dans le shader
 	shader_->setMat4("view", view);
 

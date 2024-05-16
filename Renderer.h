@@ -55,5 +55,17 @@ private:
 		glm::vec3(-1.3f,  1.0f, -1.5f)
 	};
 
+
+	//Up vector du world space
+	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+
+	//Camera
+	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);		//Où est la camera
+	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);	//Où pointe la camera
+
+	glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);				//Forward vector de la camera	//Pointe en réalité à la direction inverse car convention OpenGL
+	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));		//Right vector
+	glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);					//Up Vector
+
 };
 
