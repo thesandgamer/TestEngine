@@ -19,7 +19,6 @@ Renderer renderer;
 
 bool firstMouse = true;
 float lastMouseX = 0, lastMouseY = 0;
-float mouseX = 0, mouseY = 0;
 
 
 int main(int, char**)
@@ -54,7 +53,7 @@ int main(int, char**)
     //Pour pouvoir resize la fenêtre
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
-    //Enable le callback pour la souris
+    //Enable le callback pour la souris: va écouter les inputs que va faire la souris et appeler la fonction mouse_callback avec la postion de la souris à l'écran
     glfwSetCursorPosCallback(window, mouse_callback);
 
     glEnable(GL_DEPTH_TEST);
@@ -165,25 +164,25 @@ void processInput(GLFWwindow* window)
 
 void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 {
-    if (firstMouse) // initially set to true
+    if (firstMouse) 
     {
         lastMouseX = xpos;
         lastMouseY = ypos;
         firstMouse = false;
     }
 
+    //On va calculer la différence entre la position actuelle de la souris 
     float xoffset = xpos - lastMouseX;
     float yoffset = lastMouseY - ypos; // reversed since y-coordinates range from bottom to top
     lastMouseX = xpos;
     lastMouseY = ypos;
 
+    //Multiplie l'offset (c'est à dire la différence entre où était la souris et là où elle est actuellement) par la sensibilité pour pas que ça aille trop vite
     const float sensitivity = 0.1f;
     xoffset *= sensitivity;
     yoffset *= sensitivity;
 
-    mouseX = xoffset;
-    mouseY = yoffset;
 
-    renderer.processMouse(mouseX, mouseY);
+    renderer.processMouse(xoffset, yoffset);
 
 }

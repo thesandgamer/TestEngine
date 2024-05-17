@@ -163,7 +163,8 @@ void Renderer::init()
 //-----------View
 	//Bouger la caméra c'est comme bouger le monde entier, du coup il faut bouger avec des valeurs inverses le monde
 	// note that we're translating the scene in the reverse direction of where we want to move
-	view = glm::lookAt(cameraPos,cameraTarget,up);	//Donne les informations à la matrice de vue de où on veut que la camera regarde
+	//Où on est, où on regarde et le up du monde: créer une matrice pour changer la vue(c'est à dire le monde)
+	view = glm::lookAt(cameraPos,cameraTarget,up);	//Donne les informations à la matrice de vue de où on veut que la camera regarde 
 	//Bind dans le shader
 	shader_->setMat4("view", view);	
 
@@ -271,7 +272,7 @@ void Renderer::processMouse(float mouseX, float mouseY)
 	yaw += mouseX;
 	pitch += mouseY;
 
-	//Camera constraints
+	//Camera constraints avec haut et bas
 	if (pitch > 89.0f)
 		pitch = 89.0f;
 	if (pitch < -89.0f)

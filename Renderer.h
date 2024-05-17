@@ -69,17 +69,20 @@ private:
 
 	//Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);		//Où est la camera
-	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
-	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);	//Où pointe la camera
 
 	glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);				//Forward vector de la camera	//Pointe en réalité à la direction inverse car convention OpenGL
 
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);	//Up vector pour la camera(local)
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);//Front vector pour la camera(local)
+
+	/*
 	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));		//Right vector
-	//glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);					//Up Vector
+	glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);					//Up Vector
+	*/
 
-
+	//Pour gérer le yaw et le pitch de la camera
 	float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
 	float pitch = 0.0f;
 
