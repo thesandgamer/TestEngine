@@ -1,6 +1,5 @@
 
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
+
 
 #include "imgui.h"
 #include "backends/imgui_impl_glfw.h"
@@ -74,6 +73,7 @@ int main(int, char**)
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
+        renderer.processInputs(window);
 
         //--------------------------IMGUI
         // Start the Dear ImGui frame

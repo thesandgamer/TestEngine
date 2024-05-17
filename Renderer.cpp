@@ -163,9 +163,9 @@ void Renderer::init()
 //-----------View
 	//Bouger la caméra c'est comme bouger le monde entier, du coup il faut bouger avec des valeurs inverses le monde
 	// note that we're translating the scene in the reverse direction of where we want to move
-	view = glm::lookAt(cameraPos,cameraTarget,up);
+	view = glm::lookAt(cameraPos,cameraTarget,up);	//Donne les informations à la matrice de vue de où on veut que la camera regarde
 	//Bind dans le shader
-	shader_->setMat4("view", view);
+	shader_->setMat4("view", view);	
 
 
 //-----------Projection
@@ -207,11 +207,19 @@ void Renderer::draw()
 	/*
 	model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
 	model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));*/
-
 	//On passe les matrices de transformation  au shader
 	shader_->setMat4("model", model);
 
-
+	//Pour faire tourner la camera autour de la scene
+	/*
+	const float radius = 5.0f;
+	float camX = sin(glfwGetTime()) * radius;
+	float camZ = cos(glfwGetTime()) * radius;
+	view = glm::mat4(1.0f);
+	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
+	shader_->setMat4("view", view);//Bind la matrice dans le shader*/
+	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
 	glBindVertexArray(VAO);
 
@@ -236,9 +244,26 @@ void Renderer::draw()
 
 }
 
+void Renderer::processInputs(GLFWwindow* window)
+{
+
+//-------Camera contrôl 
+	const float cameraSpeed = 0.05f; // adjust accordingly
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		cameraPos += cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		cameraPos -= cameraSpeed * cameraFront;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+
 void Renderer::end()
 {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
 }
+

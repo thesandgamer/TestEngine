@@ -1,6 +1,9 @@
 #pragma once
 #include <memory>
 
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
 #include "Shader.h"
 
 enum RenderMode
@@ -18,6 +21,8 @@ public:
 	void update(float dt);
 	void draw();
 	void end();
+
+	void processInputs(GLFWwindow* window);
 
 	void set_render_mode(RenderMode n_mode) { render_mode_ = n_mode; }
 
@@ -59,13 +64,19 @@ private:
 	//Up vector du world space
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
+
+
 	//Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);		//Où est la camera
+	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+	glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
 	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);	//Où pointe la camera
 
 	glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);				//Forward vector de la camera	//Pointe en réalité à la direction inverse car convention OpenGL
+
 	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));		//Right vector
-	glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);					//Up Vector
+	//glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);					//Up Vector
 
 };
 
