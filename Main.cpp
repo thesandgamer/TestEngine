@@ -93,7 +93,6 @@ int main(int, char**)
 
         processInput(window);
         renderer.processInputs(window);
-        renderer.processMouse(mouseX, mouseY);
 
         renderer.update(deltaTime);
 
@@ -184,4 +183,7 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
     mouseX = xoffset;
     mouseY = yoffset;
+
+    renderer.processMouse(mouseX, mouseY);
+
 }
