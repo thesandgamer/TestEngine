@@ -23,6 +23,7 @@ public:
 	void end();
 
 	void processInputs(GLFWwindow* window);
+	void processMouse(float mouseX, float mouseY);
 
 	void set_render_mode(RenderMode n_mode) { render_mode_ = n_mode; }
 
@@ -77,6 +78,15 @@ private:
 
 	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));		//Right vector
 	//glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);					//Up Vector
+
+
+	float yaw = -90.0f;	// yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right so we initially rotate a bit to the left.
+	float pitch = 0.0f;
+
+
+
+	//----------
+	float deltaTime = 0.0f;
 
 };
 

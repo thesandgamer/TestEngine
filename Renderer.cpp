@@ -178,7 +178,7 @@ void Renderer::init()
 
 void Renderer::update(float dt)
 {
-
+	deltaTime = dt;
 
 }
 
@@ -218,8 +218,17 @@ void Renderer::draw()
 	view = glm::mat4(1.0f);
 	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	shader_->setMat4("view", view);//Bind la matrice dans le shader*/
+	//Pour contrôler la caméra qui se déplace
+	
+	cameraDirection.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraDirection.y = sin(glm::radians(pitch));
+	cameraDirection.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
+	
+
 
 	glBindVertexArray(VAO);
 
@@ -240,15 +249,13 @@ void Renderer::draw()
 	}
 
 
-
-
 }
 
 void Renderer::processInputs(GLFWwindow* window)
 {
+	float cameraSpeed = 2.5f * deltaTime; 
 
-//-------Camera contrôl 
-	const float cameraSpeed = 0.05f; // adjust accordingly
+//-------Camera control-------
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		cameraPos += cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
@@ -257,6 +264,25 @@ void Renderer::processInputs(GLFWwindow* window)
 		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+}
+
+void Renderer::processMouse(float mouseX, float mouseY)
+{
+	yaw += mouseX;
+	pitch += mouseY;
+
+	//Camera constraints
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	//On va calculer el nouveau forward de la camera en fonction du pich et du yaw
+	glm::vec3 direction;
+	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	direction.y = sin(glm::radians(pitch));
+	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(direction);
 }
 
 

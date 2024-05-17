@@ -12,8 +12,15 @@
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 
 Renderer renderer;
+
+
+bool firstMouse = true;
+float lastMouseX = 0, lastMouseY = 0;
+float mouseX = 0, mouseY = 0;
+
 
 int main(int, char**)
 {
@@ -47,6 +54,9 @@ int main(int, char**)
     //Pour pouvoir resize la fenêtre
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
+    //Enable le callback pour la souris
+    glfwSetCursorPosCallback(window, mouse_callback);
+
     glEnable(GL_DEPTH_TEST);
 
 
@@ -67,15 +77,27 @@ int main(int, char**)
     bool* rotationOpen= new bool(true);
 
 
-    renderer.init();
-    float dt = 0;
+    renderer.init();   
+    float deltaTime = 0.0f;	// Time between current frame and last frame
+    float lastFrame = 0.0f; // Time of last framec   
+
+
+    //Set le mode de la souris pour ce focus sur dans l'écran
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     while (!glfwWindowShouldClose(window))
     {
+        float currentFrame = glfwGetTime();
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+
         processInput(window);
         renderer.processInputs(window);
+        renderer.processMouse(mouseX, mouseY);
 
-        //--------------------------IMGUI
+        renderer.update(deltaTime);
+
+//--------------------------IMGUI
         // Start the Dear ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
@@ -87,8 +109,8 @@ int main(int, char**)
             ImGui::Begin("Rotation", rotationOpen, window_flags);
             ImGui::End();
         }
-        //ImGui::ShowDemoWindow(); // Show demo window! :)
-        //-------------------------
+        //ImGui::ShowDemoWindow(); // Show demo window
+//-------------------------
 
          //-------------------------DRAWING
         glClearColor(clear_color.x * clear_color.w, clear_color.y * clear_color.w, clear_color.z * clear_color.w, clear_color.w);   //Change la couleur de clean de l'écran
@@ -100,7 +122,7 @@ int main(int, char**)
         renderer.draw();
 
 
-        //--------------------------IMGUI
+//--------------------------IMGUI
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -108,6 +130,7 @@ int main(int, char**)
             ImGui::UpdatePlatformWindows();
             ImGui::RenderPlatformWindowsDefault();
         }
+//--------------------------
 
         // (Your code calls glfwSwapBuffers() etc.)
         //-------------------------
@@ -139,4 +162,26 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+}
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse) // initially set to true
+    {
+        lastMouseX = xpos;
+        lastMouseY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastMouseX;
+    float yoffset = lastMouseY - ypos; // reversed since y-coordinates range from bottom to top
+    lastMouseX = xpos;
+    lastMouseY = ypos;
+
+    const float sensitivity = 0.1f;
+    xoffset *= sensitivity;
+    yoffset *= sensitivity;
+
+    mouseX = xoffset;
+    mouseY = yoffset;
 }
