@@ -251,11 +251,12 @@ void Renderer::draw()
 
 
 
+	glm::vec3 posOfLight = { lightPos.x, lightPos.y + glm::sin((float)glfwGetTime() * .5f) * 2, lightPos.z };
 
 
 
-//-------------Transform-------
-	//Use shader
+	//-------------Transform-------
+		//Use shader
 	shader_->use();
 
 	//Pour faire tourner la camera autour de la scene
@@ -270,7 +271,9 @@ void Renderer::draw()
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Gère où la camera regarde(quelle partie du monde elle va voir)
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
-	//Set la position de la camera dans le shader
+	//Set la position de la lumière dans le shader
+	shader_->setVec3("lightPos", posOfLight);
+
 
 	//L'idée c'est qu'on a un array qui va stoquer des positions auquelles sont censé être nos cubes(tous les mêmes)
 	//Pour chaque cube on va set le shader avec les informations de transform du cube puis on va dessiner
@@ -283,7 +286,7 @@ void Renderer::draw()
 		float angle = 20.0f * i;
 		//model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f*i, 0.0f));
-		model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5)); 
+		model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
 		shader_->setMat4("model", model);	//On passe la matrice de transformation  au shader
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);	//Dessine les triangles
@@ -294,9 +297,10 @@ void Renderer::draw()
 	lightShader_->use();
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, lightPos);
+	model = glm::translate(model, posOfLight);
 	model = glm::scale(model, glm::vec3(.2f));
 	lightShader_->setMat4("model", model);
+	glm::sin((float)glfwGetTime());
 
 	lightShader_->setMat4("view", view);
 
