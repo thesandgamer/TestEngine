@@ -13,6 +13,8 @@
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+
 
 Renderer renderer;
 
@@ -55,6 +57,9 @@ int main(int, char**)
 
     //Enable le callback pour la souris: va écouter les inputs que va faire la souris et appeler la fonction mouse_callback avec la postion de la souris à l'écran
     glfwSetCursorPosCallback(window, mouse_callback);
+
+    //Enable callback pour scroll de la souris
+    glfwSetScrollCallback(window, scroll_callback);
 
     glEnable(GL_DEPTH_TEST);
 
@@ -185,4 +190,10 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
 
     renderer.processMouse(xoffset, yoffset);
 
+}
+
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    renderer.processScroll(yoffset);
 }

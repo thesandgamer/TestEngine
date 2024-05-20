@@ -170,7 +170,7 @@ void Renderer::init()
 
 
 //-----------Projection
-	projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+	projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
 	//Bind dans le shader
 	shader_->setMat4("projection", projection);
 
@@ -288,6 +288,19 @@ void Renderer::processMouse(float mouseX, float mouseY)
 
 	//Pareil pour le camera Up
 	cameraUp = glm::cross(cameraFront, cameraRight);
+}
+
+void Renderer::processScroll(float scrollvalue)
+{
+	fov -= scrollvalue;
+	if (fov < 1.0f)
+		fov = 1.0f;
+	if (fov > 45.0f)
+		fov = 45.0f;
+
+	projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+	//Bind dans le shader
+	shader_->setMat4("projection", projection);
 }
 
 
