@@ -220,10 +220,7 @@ void Renderer::draw()
 	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	shader_->setMat4("view", view);//Bind la matrice dans le shader*/
 	//Pour contrôler la caméra qui se déplace
-	
-	cameraDirection.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraDirection.y = sin(glm::radians(pitch));
-	cameraDirection.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
 
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 
@@ -256,15 +253,15 @@ void Renderer::processInputs(GLFWwindow* window)
 {
 	float cameraSpeed = 2.5f * deltaTime; 
 
-//-------Camera control-------
+//-------Camera control
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		cameraPos += cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 		cameraPos -= cameraSpeed * cameraFront;
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		cameraPos += cameraSpeed * cameraRight;
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+		cameraPos -= cameraSpeed * cameraRight;
 }
 
 void Renderer::processMouse(float mouseX, float mouseY)
@@ -278,12 +275,19 @@ void Renderer::processMouse(float mouseX, float mouseY)
 	if (pitch < -89.0f)
 		pitch = -89.0f;
 
-	//On va calculer el nouveau forward de la camera en fonction du pich et du yaw
+	//On va calculer le nouveau forward de la camera en fonction du pich et du yaw
 	glm::vec3 direction;
 	direction.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
 	direction.y = sin(glm::radians(pitch));
 	direction.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+
 	cameraFront = glm::normalize(direction);
+
+	//Et on va aussi calculer le forward de la camera(faire une fonction qui get le right en retrournant la fonction sera plus simple)
+	cameraRight = glm::normalize(glm::cross(up, cameraFront));
+
+	//Pareil pour le camera Up
+	cameraUp = glm::cross(cameraFront, cameraRight);
 }
 
 
