@@ -269,7 +269,8 @@ void Renderer::draw()
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Gère où la camera regarde(quelle partie du monde elle va voir)
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
-
+	//Set la position de la camera dans le shader
+	shader_->setVec3("viewPos", cameraPos);
 
 	//L'idée c'est qu'on a un array qui va stoquer des positions auquelles sont censé être nos cubes(tous les mêmes)
 	//Pour chaque cube on va set le shader avec les informations de transform du cube puis on va dessiner
