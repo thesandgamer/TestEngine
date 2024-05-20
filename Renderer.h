@@ -33,6 +33,8 @@ private:
 	unsigned int VAO;
 	unsigned int EBO;
 
+	unsigned int lightVAO;
+
 	unsigned int shader_program_;
 
 	unsigned int texture;
@@ -44,6 +46,7 @@ private:
 	glm::mat4 projection;					//Comment sont rendu les objets(orthographique, perspective,...)
 
 	std::unique_ptr<Shader> shader_;
+	std::unique_ptr<Shader> lightShader_;
 
 	RenderMode render_mode_ = Flat;
 
@@ -67,7 +70,6 @@ private:
 	glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
 
 
-
 	//Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);		//Où est la camera
 
@@ -81,6 +83,10 @@ private:
 
 	float fov = 45.0f;
 
+
+
+	//-------Lights
+	glm::vec3 lightPos = { 1.2f, 1.0f, 2.0f };
 
 	//----------
 	float deltaTime = 0.0f;

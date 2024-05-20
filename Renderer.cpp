@@ -12,7 +12,10 @@
 void Renderer::init()
 {
 	shader_ = std::make_unique<Shader>("Lit.vert", "Lit.frag");
+	lightShader_ = std::make_unique<Shader>("Light.vert", "Light.frag");
 
+
+//////]-----------------------------[Données du mesh]-----------------------------[
 	//Coorodonées des points en local de l'objet
 	float vertices[] = {
 	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
@@ -63,6 +66,8 @@ void Renderer::init()
 	};
 
 
+	//Le VBO contient les datas des vertices
+
 	//----------------------------------------------------------------------------------
 	glGenVertexArrays(1, &VAO);	//Génère le vertex array object
 	glGenBuffers(1, &VBO);	//Génère vertex buffer object
@@ -87,13 +92,14 @@ void Renderer::init()
 	glEnableVertexAttribArray(1);
 
 
-	//-----------------------------Texture------------------
-//Génère la texture
+
+//--------------------Textures du mesh
+	//Génère la texture
 	glGenTextures(1, &texture);//Combien de texture on veut créer et où on les stoques
 	glActiveTexture(GL_TEXTURE0); // activate the texture unit first before binding texture
 	glBindTexture(GL_TEXTURE_2D, texture);//On bind la texture
 
-//Set paramètres
+	//Set paramètres
 	//Set les options pour les coordonées de texture quand sort de la range
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//en U
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//en V
@@ -158,6 +164,9 @@ void Renderer::init()
 
 
 
+
+
+
 //////]-----------------------------[Transforms]-----------------------------[
 	https://learnopengl.com/Getting-started/Coordinate-Systems
 
@@ -182,7 +191,32 @@ void Renderer::init()
 	projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
 	shader_->setMat4("projection", projection);//Bind dans le shader
 
-	//Ensuite les points sont rendu par rapport à l'écran 
+	//Ensuite les points sont rendu par rapport à l'écran
+
+
+
+
+//////]-----------------------------[Lighting]-----------------------------[
+//--------------------Lighting Source Mesh
+
+	//Créer un VAO pour la lumière
+	glGenVertexArrays(1, &lightVAO);
+	glBindVertexArray(lightVAO);
+	// we only need to bind to the VBO, the container's VBO's data already contains the data.
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	// set the vertex attribute 
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
+	glEnableVertexAttribArray(0);
+
+	//Set shaders
+	shader_->use();
+	shader_->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
+	shader_->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+
+	//Set shader for light source
+	lightShader_->use();
+	lightShader_->setMat4("projection", projection);
+	lightShader_->setMat4("view", view);
 
 
 }
@@ -202,15 +236,15 @@ void Renderer::draw()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture2);
 
-	//Bind Vertex
-	glBindVertexArray(VAO);
 
 
-	//Use shader
-	shader_->use();
+
+
 
 
 //-------------Transform-------
+	//Use shader
+	shader_->use();
 
 	//Pour faire tourner la camera autour de la scene
 	/*
@@ -220,16 +254,16 @@ void Renderer::draw()
 	view = glm::mat4(1.0f);
 	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	shader_->setMat4("view", view);//Bind la matrice dans le shader*/
-
-
 	//Gestion de la matrice pour la camera
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Gère où la camera regarde(quelle partie du monde elle va voir)
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
 
+
 	//L'idée c'est qu'on a un array qui va stoquer des positions auquelles sont censé être nos cubes(tous les mêmes)
 	//Pour chaque cube on va set le shader avec les informations de transform du cube puis on va dessiner
 	//Ca va donc dessiner le cube en fonction de ce qu'on à mis dans le shader
+	glBindVertexArray(VAO); //Bind Vertex
 	for (unsigned int i = 0; i < 10; i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);	//Reset car on change les valeurs
@@ -243,6 +277,19 @@ void Renderer::draw()
 		glDrawArrays(GL_TRIANGLES, 0, 36);	//Dessine les triangles
 	}
 
+
+	//----For Light cube
+	lightShader_->use();
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, lightPos);
+	model = glm::scale(model, glm::vec3(.2f));
+	lightShader_->setMat4("model", model);
+
+	lightShader_->setMat4("view", view);
+
+	glBindVertexArray(lightVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
 
 }
 
@@ -304,7 +351,10 @@ void Renderer::processScroll(float scrollvalue)
 void Renderer::end()
 {
 	glDeleteVertexArrays(1, &VAO);
+	glDeleteVertexArrays(1, &lightVAO);
+
 	glDeleteBuffers(1, &VBO);
 	glDeleteBuffers(1, &EBO);
+
 }
 

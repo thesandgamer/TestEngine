@@ -84,5 +84,11 @@
     <None Include="Lit.vert">
       <Filter>Engine\Rendering\Shaders</Filter>
     </None>
+    <None Include="Light.frag">
+      <Filter>Engine\Rendering\Shaders</Filter>
+    </None>
+    <None Include="Light.vert">
+      <Filter>Engine\Rendering\Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>
