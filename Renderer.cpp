@@ -224,6 +224,7 @@ void Renderer::init()
 	shader_->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
 	shader_->setVec3("lightPos", lightPos);
 
+
 	//Set shader for light source
 	lightShader_->use();
 	lightShader_->setMat4("projection", projection);
@@ -270,7 +271,6 @@ void Renderer::draw()
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
 	//Set la position de la camera dans le shader
-	shader_->setVec3("viewPos", cameraPos);
 
 	//L'idée c'est qu'on a un array qui va stoquer des positions auquelles sont censé être nos cubes(tous les mêmes)
 	//Pour chaque cube on va set le shader avec les informations de transform du cube puis on va dessiner
