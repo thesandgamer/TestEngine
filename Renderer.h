@@ -70,7 +70,6 @@ private:
 
 	//Camera
 	glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);		//Où est la camera
-	glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);	//Où pointe la camera
 
 	glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);					//Forward vector de la camera
 	glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraFront));		//Right vector de la camera

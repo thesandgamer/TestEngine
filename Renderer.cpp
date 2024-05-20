@@ -12,7 +12,8 @@
 void Renderer::init()
 {
 	shader_ = std::make_unique<Shader>("Lit.vert", "Lit.frag");
-	//Points
+
+	//Coorodonées des points en local de l'objet
 	float vertices[] = {
 	-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 	 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -156,23 +157,32 @@ void Renderer::init()
 	shader_->setInt("texture2", 1);
 
 
-	//-----------------------------Transforms------------------
+
+//////]-----------------------------[Transforms]-----------------------------[
+	https://learnopengl.com/Getting-started/Coordinate-Systems
+
 //-----------Model matrix/transform
-	//model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	//La matrice de model permet de gérer les points relatif à l'objet dans la scene du monde(donc déplacement, rotation et taille)
+	//L'idée est de modifier la matrice du model(local transfrom) sur laquel on va appliquer des transformations(rotation, translation, scale) et qu'on va ensuite injecter au shader pour faire bouger nos vertexes
+	//Les opérations de matrices se font dans l'ordre inverse, on met en dernier ce qui se fait en premier(faire la scale en premier sinon ça va scale les autre modifications)
+
+	//Pour la rotation tourner autour d'un axe normalisé
 
 //-----------View
+	//La matrice de vue permet de rendre les points par rapport à la camera 
 	//Bouger la caméra c'est comme bouger le monde entier, du coup il faut bouger avec des valeurs inverses le monde
 	// note that we're translating the scene in the reverse direction of where we want to move
 	//Où on est, où on regarde et le up du monde: créer une matrice pour changer la vue(c'est à dire le monde)
-	view = glm::lookAt(cameraPos,cameraTarget,up);	//Donne les informations à la matrice de vue de où on veut que la camera regarde 
-	//Bind dans le shader
-	shader_->setMat4("view", view);	
+	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Donne les informations à la matrice de vue de où on veut que la camera regarde 
+	shader_->setMat4("view", view);	//Bind dans le shader
 
 
 //-----------Projection
+	//La projection sert à gérer si la vue de la camera se fait en Orthographique ou en perspective
 	projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
-	//Bind dans le shader
-	shader_->setMat4("projection", projection);
+	shader_->setMat4("projection", projection);//Bind dans le shader
+
+	//Ensuite les points sont rendu par rapport à l'écran 
 
 
 }
@@ -192,24 +202,15 @@ void Renderer::draw()
 	glActiveTexture(GL_TEXTURE1);
 	glBindTexture(GL_TEXTURE_2D, texture2);
 
+	//Bind Vertex
+	glBindVertexArray(VAO);
 
 
 	//Use shader
 	shader_->use();
 
-	//Reset la matrice du model car on va en changer les valeurs
-	//model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
 
 //-------------Transform-------
-	//		L'idée est de modifier la matrice du model(local transfrom) sur laquel on va appliquer des transformations(rotation, translation, scale) et qu'on va ensuite injecter au shader pour faire bouger nos vertexes
-	//Les opérations de matrices se font dans l'ordre inverse, on met en dernier ce qui se fait en premier(faire la scale en premier sinon ça va scale les autre modifications)
-
-	//Pour la rotation tourner autour d'un axe normalisé
-	/*
-	model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-	model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));*/
-	//On passe les matrices de transformation  au shader
-	shader_->setMat4("model", model);
 
 	//Pour faire tourner la camera autour de la scene
 	/*
@@ -219,31 +220,27 @@ void Renderer::draw()
 	view = glm::mat4(1.0f);
 	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	shader_->setMat4("view", view);//Bind la matrice dans le shader*/
-	//Pour contrôler la caméra qui se déplace
 
 
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-
+	//Gestion de la matrice pour la camera
+	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Gère où la camera regarde(quelle partie du monde elle va voir)
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
-	
 
-
-	glBindVertexArray(VAO);
 
 	//L'idée c'est qu'on a un array qui va stoquer des positions auquelles sont censé être nos cubes(tous les mêmes)
 	//Pour chaque cube on va set le shader avec les informations de transform du cube puis on va dessiner
 	//Ca va donc dessiner le cube en fonction de ce qu'on à mis dans le shader
 	for (unsigned int i = 0; i < 10; i++)
 	{
-		glm::mat4 model = glm::mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);	//Reset car on change les valeurs
 		model = glm::translate(model, cubePositions[i]);
 		float angle = 20.0f * i;
 		//model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
 		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f*i, 0.0f));
 		model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5)); 
-		shader_->setMat4("model", model);
+		shader_->setMat4("model", model);	//On passe la matrice de transformation  au shader
 
-		glDrawArrays(GL_TRIANGLES, 0, 36);
+		glDrawArrays(GL_TRIANGLES, 0, 36);	//Dessine les triangles
 	}
 
 

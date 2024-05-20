@@ -56,6 +56,7 @@
     <ClCompile Include="stb_image.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
+    <ClCompile Include="Camera.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imgui.h">
@@ -74,6 +75,7 @@
     <ClInclude Include="stb_image.h">
       <Filter>Engine</Filter>
     </ClInclude>
+    <ClInclude Include="Camera.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Lit.frag">
