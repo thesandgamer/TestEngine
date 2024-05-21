@@ -28,6 +28,8 @@ public:
 
 	void set_render_mode(RenderMode n_mode) { render_mode_ = n_mode; }
 
+	unsigned int loadTexture(char const* path);
+
 private:
 	unsigned int VBO;	//Créer un ID pour le vertex buffer
 	unsigned int VAO;
@@ -37,8 +39,7 @@ private:
 
 	unsigned int shader_program_;
 
-	unsigned int texture;
-	unsigned int texture2;
+	unsigned int diffuseMap;
 
 	//Matrices pour
 	glm::mat4 model = glm::mat4(1.0f);	//Matrice qui controle le model par rapport au monde
