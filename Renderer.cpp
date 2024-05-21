@@ -219,16 +219,28 @@ void Renderer::init()
 	glEnableVertexAttribArray(0);
 
 	//Set shaders
+	glm::vec3 lightColor = { .5f, .5f, .5f };
+
 	shader_->use();
-	shader_->setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-	shader_->setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+	//ToDo: bien gérer l'ambiant et le diffuse de la lumière, car je n'ai pas trop compris
+	shader_->setVec3("light.ambient", lightColor);
+	shader_->setVec3("light.diffuse", lightColor); // darken diffuse light a bit
+	shader_->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 	shader_->setVec3("lightPos", lightPos);
 
+	//To set material for cubes
+	//ToDo: bien gérer l'ambiant et le diffuse du material, car je n'ai pas trop compris
+	glm::vec3 materialColor = { .0f, 0.5f, 0.5f };
+	shader_->setVec3("material.ambient", materialColor);
+	shader_->setVec3("material.diffuse", .5f, .5f, .5f);
+	shader_->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+	shader_->setFloat("material.shininess", 32.0f);
 
 	//Set shader for light source
 	lightShader_->use();
 	lightShader_->setMat4("projection", projection);
 	lightShader_->setMat4("view", view);
+	lightShader_->setVec3("lightColor", lightColor);
 
 
 }
@@ -292,18 +304,17 @@ void Renderer::draw()
 		glDrawArrays(GL_TRIANGLES, 0, 36);	//Dessine les triangles
 	}
 
-
 	//----For Light cube
 	lightShader_->use();
 
+	//Déplace la lumière
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, posOfLight);
 	model = glm::scale(model, glm::vec3(.2f));
 	lightShader_->setMat4("model", model);
-	glm::sin((float)glfwGetTime());
-
 	lightShader_->setMat4("view", view);
 
+	//Dessine le cube de lumière
 	glBindVertexArray(lightVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 
