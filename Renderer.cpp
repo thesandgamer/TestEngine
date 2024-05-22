@@ -115,7 +115,6 @@ void Renderer::init()
 	//La matrice de model permet de gérer les points relatif à l'objet dans la scene du monde(donc déplacement, rotation et taille)
 	//L'idée est de modifier la matrice du model(local transfrom) sur laquel on va appliquer des transformations(rotation, translation, scale) et qu'on va ensuite injecter au shader pour faire bouger nos vertexes
 	//Les opérations de matrices se font dans l'ordre inverse, on met en dernier ce qui se fait en premier(faire la scale en premier sinon ça va scale les autre modifications)
-
 	//Pour la rotation tourner autour d'un axe normalisé
 
 //-----------View
@@ -123,9 +122,9 @@ void Renderer::init()
 	//Bouger la caméra c'est comme bouger le monde entier, du coup il faut bouger avec des valeurs inverses le monde
 	// note that we're translating the scene in the reverse direction of where we want to move
 	//Où on est, où on regarde et le up du monde: créer une matrice pour changer la vue(c'est à dire le monde)
+
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Donne les informations à la matrice de vue de où on veut que la camera regarde 
 	shader_->setMat4("view", view);	//Bind dans le shader
-
 
 //-----------Projection
 	//La projection sert à gérer si la vue de la camera se fait en Orthographique ou en perspective
@@ -149,18 +148,25 @@ void Renderer::init()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//Set shaders
+	//Set shaders pour le cube de lumière
 	glm::vec3 lightColor = { .5f, .5f, .5f };
+	//Set shader for light source
+	lightShader_->use();
+	lightShader_->setMat4("projection", projection);
+	lightShader_->setMat4("view", view);
+	lightShader_->setVec3("lightColor", lightColor);
+
+	//---Set les params des shaders
 
 	shader_->use();
 	//ToDo: bien gérer l'ambiant et le diffuse de la lumière, car je n'ai pas trop compris
 	shader_->setVec3("light.ambient", lightColor);
 	shader_->setVec3("light.diffuse", lightColor); // darken diffuse light a bit
 	shader_->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-	shader_->setVec3("lightPos", lightPos);
+	shader_->setVec3("light.position", lightPos);
+	shader_->setVec3("viewPos", cameraPos);
 
 	//To set material for cubes
-	//ToDo: bien gérer l'ambiant et le diffuse du material, car je n'ai pas trop compris
 	glm::vec3 materialColor = { 1.0f, 1.0f, 1.0f };
 
 	shader_->setInt("material.diffuseTexture", 0);
@@ -168,11 +174,7 @@ void Renderer::init()
 	shader_->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
 	shader_->setFloat("material.shininess", 32.0f);
 
-	//Set shader for light source
-	lightShader_->use();
-	lightShader_->setMat4("projection", projection);
-	lightShader_->setMat4("view", view);
-	lightShader_->setVec3("lightColor", lightColor);
+
 
 
 }
@@ -186,17 +188,7 @@ void Renderer::update(float dt)
 void Renderer::draw()
 {
 
-	// bind Texture
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, diffuseMap);
-
-
-
-
 	glm::vec3 posOfLight = { lightPos.x, lightPos.y + glm::sin((float)glfwGetTime() * .5f) * 2, lightPos.z };
-
-
-
 	//-------------Transform-------
 		//Use shader
 	shader_->use();
@@ -214,13 +206,19 @@ void Renderer::draw()
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
 	//Set la position de la lumière dans le shader
-	shader_->setVec3("lightPos", posOfLight);
+	shader_->setVec3("light.position", posOfLight);
+	shader_->setVec3("viewPos", cameraPos);
 
+
+	// bind Texture
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, diffuseMap);
+
+	glBindVertexArray(VAO); //Bind Vertex
 
 	//L'idée c'est qu'on a un array qui va stoquer des positions auquelles sont censé être nos cubes(tous les mêmes)
 	//Pour chaque cube on va set le shader avec les informations de transform du cube puis on va dessiner
 	//Ca va donc dessiner le cube en fonction de ce qu'on à mis dans le shader
-	glBindVertexArray(VAO); //Bind Vertex
 	for (unsigned int i = 0; i < 10; i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);	//Reset car on change les valeurs
@@ -234,7 +232,7 @@ void Renderer::draw()
 		glDrawArrays(GL_TRIANGLES, 0, 36);	//Dessine les triangles
 	}
 
-	//----For Light cube
+//-------For Light cube
 	lightShader_->use();
 
 	//Déplace la lumière
