@@ -23,9 +23,9 @@ in vec3 FragPos;
 in vec3 Normal;  
 in vec2 TexCoords;
 
+uniform vec3 viewPos;       //Position de la camera
 uniform Material material;  //Données du material du shaders
 uniform Light light;        //Données de la lumière
-uniform vec3 viewPos;       //Position de la camera
 
 
 void main()
@@ -42,9 +42,9 @@ void main()
 
 	//Calculate specular
 	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 reflectDir = reflect(-lightDir, norm);  
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specular = light.specular * spec * texture(material.specularTexture, TexCoords).rgb ;
+    vec3 reflectDir = reflect(-lightDir, norm);  
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
+    vec3 specular = light.specular * spec * texture(material.specularTexture, TexCoords).rgb;   //Faire en sorte que la specular ait la couleur de la lumière
 
     
 	vec3 result = (ambient + diffuse + specular);

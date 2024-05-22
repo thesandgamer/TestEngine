@@ -100,8 +100,8 @@ void Renderer::init()
 
 //--------------------Textures du mesh
 	char const* pathName = "resources/textures/container2.png";
-	diffuseMap = loadTexture(pathName);		//Load la texture
-	pathName = "resources/textures/container2_specular.png";
+	//diffuseMap = loadTexture(pathName);		//Load la texture
+	pathName = "resources/textures/FullSpec.png";
 	specularMap = loadTexture(pathName);		//Load la texture
 
 
@@ -146,7 +146,8 @@ void Renderer::init()
 	glEnableVertexAttribArray(0);
 
 	//-------Set shaders pour le cube de lumière
-	glm::vec3 lightColor = { .5f, .5f, .5f };
+	glm::vec3 lightColor = { .7f, .7f, .7f };
+	glm::vec3 environementColor= { .1f, .1f, .1f };
 	//Set shader for light source
 	lightShader_->use();
 	lightShader_->setMat4("projection", projection);
@@ -164,8 +165,8 @@ void Renderer::init()
 
 	//Set les paramètre pour la lumière
 	//ToDo: bien gérer l'ambiant et le diffuse de la lumière, car je n'ai pas trop compris
-	shader_->setVec3("light.ambient", { lightColor.x/2,lightColor.y/2,lightColor.z/2 });
 	shader_->setVec3("light.diffuse", lightColor); // darken diffuse light a bit
+	shader_->setVec3("light.ambient", environementColor);
 	shader_->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
 
@@ -192,14 +193,16 @@ void Renderer::update(float dt)
 
 void Renderer::draw()
 {
-
-	//glm::vec3 posOfLight = { lightPos.x, lightPos.y + glm::sin((float)glfwGetTime() * .5f) * 2, lightPos.z };
+	//	glm::vec3 posOfLight = { lightPos.x, lightPos.y + glm::sin((float)glfwGetTime() * .5f) * 2, lightPos.z };
 	glm::vec3 posOfLight = lightPos;
 
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Gère où la camera regarde(quelle partie du monde elle va voir)
 
 	
 	shader_->use(); //Use shader
+
+	//Gestion de la matrice pour la camera
+	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
 	//Set la position de la lumière dans le shader
 	shader_->setVec3("light.position", posOfLight);
@@ -214,8 +217,6 @@ void Renderer::draw()
 	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	*/
 
-	//Gestion de la matrice pour la camera
-	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
 
 //----------Manage objects
@@ -364,8 +365,8 @@ unsigned int Renderer::loadTexture(char const* path)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//en U
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//en V
 		//On va set la méthode d'interpolation des pixels(quand upscale ou downscale): nearest pixelise, linear blur
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		//Création des options pour les mipmaps 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
