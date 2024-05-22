@@ -13,21 +13,23 @@ out vec3 FragPos;
 out vec3 Normal;
 out vec2 TexCoords;
 
-//out vec3 LightPos;
+out mat4 ViewMat;
 
-//uniform vec3 lightPos;
 
+//Actuellement le shader est fait en local et pas en world,pour passer en world il faut: dans le .vert enlever le *view pour Fragpos et Normal
+//Et dans les .frag remplacer normalize(viewPos - FragPos) pour le calcul de viewDir 
+//et remettre viewPos dans le calcul de viewDir et remplacer "vec3(ViewMat * vec4(light.position, 1.0))" par light.position
 
 void main()
 {
-	FragPos = vec3(model * vec4(aPos, 1.0));	//On multiplie par la model pour transformer en coodinées world
+	FragPos = vec3(view * model * vec4(aPos, 1.0));	//On multiplie par la model pour transformer en coodinées world
 
-	Normal = mat3(transpose(inverse(model))) * aNormal; 
-
-	//LightPos = vec3(view * vec4(lightPos, 1.0));
+	Normal = mat3(transpose(inverse(view *model))) * aNormal; 
 
 	TexCoords = aTexCoords;	//Passe les coordonées des textures au fragement shader
 
-	gl_Position = projection * view * vec4(FragPos, 1.0);
+	gl_Position = projection * view * model * vec4(aPos, 1.0);
+
+	ViewMat = view;
 
 }

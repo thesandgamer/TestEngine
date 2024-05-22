@@ -99,8 +99,8 @@ void Renderer::init()
 	
 
 //--------------------Textures du mesh
-	char const* pathName = "resources/textures/container2.png";
-	//diffuseMap = loadTexture(pathName);		//Load la texture
+	char const* pathName = "resources/textures/FullBlack.png";
+	diffuseMap = loadTexture(pathName);		//Load la texture
 	pathName = "resources/textures/FullSpec.png";
 	specularMap = loadTexture(pathName);		//Load la texture
 
@@ -176,7 +176,7 @@ void Renderer::init()
 	shader_->setInt("material.diffuseTexture", 0);//Définit la texture, la value va être la valeur d'où est stoqué la texture(0/1/2...)
 	shader_->setVec3("material.color", materialColor);
 	shader_->setInt("material.specularTexture", 1);
-	shader_->setFloat("material.shininess", 64.0f);
+	shader_->setFloat("material.shininess", 64);
 	
 	//-----------
 	shader_->setVec3("light.position", lightPos);
