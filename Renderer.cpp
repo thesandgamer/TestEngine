@@ -99,9 +99,9 @@ void Renderer::init()
 	
 
 //--------------------Textures du mesh
-	char const* pathName = "resources/textures/FullBlack.png";
+	char const* pathName = "resources/textures/container2.png";
 	diffuseMap = loadTexture(pathName);		//Load la texture
-	pathName = "resources/textures/FullSpec.png";
+	pathName = "resources/textures/container2_specular.png";
 	specularMap = loadTexture(pathName);		//Load la texture
 
 
