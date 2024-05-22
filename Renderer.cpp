@@ -156,7 +156,7 @@ void Renderer::init()
 	
 	shader_->use();
 	//ToDo: bien gérer l'ambiant et le diffuse de la lumière, car je n'ai pas trop compris
-	shader_->setVec3("light.ambient", lightColor);
+	shader_->setVec3("light.ambient", { lightColor.x/2,lightColor.y/2,lightColor.z/2 });
 	shader_->setVec3("light.diffuse", lightColor); // darken diffuse light a bit
 	shader_->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
