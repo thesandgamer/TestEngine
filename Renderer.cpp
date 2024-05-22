@@ -170,6 +170,11 @@ void Renderer::init()
 	shader_->setVec3("light.ambient", environementColor);
 	shader_->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
+	//Set attenuation for point light
+	shader_->setFloat("light.constant", 1.0f);
+	shader_->setFloat("light.linear", 0.09f);
+	shader_->setFloat("light.quadratic", 0.032f);
+
 
 	//To set material for cubes
 	glm::vec3 materialColor = { 1.0f, 1.0f, 1.0f };
@@ -221,7 +226,7 @@ void Renderer::draw()
 
 
 //----------Manage objects
-
+	/*
 	glm::mat4 model = glm::mat4(1.0f);
 	shader_->setMat4("model", model);
 
@@ -235,9 +240,9 @@ void Renderer::draw()
 	// render the cube
 	glBindVertexArray(VAO);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
+	*/
 
-
-	/*
+	
 	//Bind la texture de diffuse à 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -261,7 +266,7 @@ void Renderer::draw()
 		shader_->setMat4("model", model);	//On passe la matrice de transformation  au shader
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);	//Dessine les triangles
-	}*/
+	}
 
 //-------For Light cube
 
