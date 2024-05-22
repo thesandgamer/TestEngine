@@ -8,9 +8,10 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-out vec2 TexCoords;
+
 out vec3 FragPos; 
 out vec3 Normal;
+out vec2 TexCoords;
 
 //out vec3 LightPos;
 
@@ -25,7 +26,8 @@ void main()
 
 	//LightPos = vec3(view * vec4(lightPos, 1.0));
 
+	TexCoords = aTexCoords;	//Passe les coordonées des textures au fragement shader
+
 	gl_Position = projection * view * vec4(FragPos, 1.0);
 
-	TexCoords = aTexCoords;	//Passe les coordonées des textures au fragement shader
 }

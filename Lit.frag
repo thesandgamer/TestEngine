@@ -31,13 +31,13 @@ uniform vec3 viewPos;       //Position de la camera
 void main()
 {
 	//Calculate ambiant color
-	vec3 ambient = light.ambient * texture(material.diffuseTexture, TexCoords).rgb ;
+	vec3 ambient = light.ambient * texture(material.diffuseTexture, TexCoords).rgb * material.color ;
 
 	//Calculate diffuse
 	vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos); 
 	float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = light.diffuse * diff *  texture(material.diffuseTexture, TexCoords).rgb ;  
+    vec3 diffuse = light.diffuse * diff *  texture(material.diffuseTexture, TexCoords).rgb * material.color ;  
 
 
 	//Calculate specular

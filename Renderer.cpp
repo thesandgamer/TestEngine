@@ -68,19 +68,14 @@ void Renderer::init()
 	};
 	*/
 
-	
-
 	//----------------------------------------------------------------------------------
-	glGenVertexArrays(1, &VAO);	//Génère le vertex array object
-	glGenBuffers(1, &VBO);	//Génère vertex buffer object
-	//glGenBuffers(1, &EBO);	//Génère l'Element buffer object
+	glGenVertexArrays(1, &VAO);	//Génère le vertex array object 
+	glGenBuffers(1, &VBO);		//Génère vertex buffer object //Le VBO va contenir les datas des vertices
+	//glGenBuffers(1, &EBO);		//Génère l'Element buffer object
 
-	//Le VBO contient les datas des vertices
+
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glBindVertexArray(VAO);	//On bind le VAO	
-
 
 	/*
 	//Pareil pour l'EBO
@@ -89,11 +84,11 @@ void Renderer::init()
 	*/
 
 	// Set la façon dont opengl va lire les données stoquées
-
+	glBindVertexArray(VAO);
 	// position attribute
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
-
+	
 	// normal attribute
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
 	glEnableVertexAttribArray(1);
@@ -101,7 +96,7 @@ void Renderer::init()
 	// texture coord attribute
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-
+	
 
 //--------------------Textures du mesh
 	char const* pathName = "resources/textures/container2.png";
@@ -122,7 +117,7 @@ void Renderer::init()
 	//Bouger la caméra c'est comme bouger le monde entier, du coup il faut bouger avec des valeurs inverses le monde
 	// note that we're translating the scene in the reverse direction of where we want to move
 	//Où on est, où on regarde et le up du monde: créer une matrice pour changer la vue(c'est à dire le monde)
-
+	shader_->use();
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Donne les informations à la matrice de vue de où on veut que la camera regarde 
 	shader_->setMat4("view", view);	//Bind dans le shader
 
@@ -158,11 +153,14 @@ void Renderer::init()
 
 	//---Set les params des shaders
 
+	
 	shader_->use();
 	//ToDo: bien gérer l'ambiant et le diffuse de la lumière, car je n'ai pas trop compris
 	shader_->setVec3("light.ambient", lightColor);
 	shader_->setVec3("light.diffuse", lightColor); // darken diffuse light a bit
 	shader_->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+
+	//
 	shader_->setVec3("light.position", lightPos);
 	shader_->setVec3("viewPos", cameraPos);
 
@@ -172,8 +170,8 @@ void Renderer::init()
 	shader_->setInt("material.diffuseTexture", 0);
 	shader_->setVec3("material.color", materialColor);
 	shader_->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-	shader_->setFloat("material.shininess", 32.0f);
-
+	shader_->setFloat("material.shininess", 64.0f);
+	
 
 
 
@@ -188,10 +186,17 @@ void Renderer::update(float dt)
 void Renderer::draw()
 {
 
-	glm::vec3 posOfLight = { lightPos.x, lightPos.y + glm::sin((float)glfwGetTime() * .5f) * 2, lightPos.z };
-	//-------------Transform-------
-		//Use shader
-	shader_->use();
+	//glm::vec3 posOfLight = { lightPos.x, lightPos.y + glm::sin((float)glfwGetTime() * .5f) * 2, lightPos.z };
+	glm::vec3 posOfLight = lightPos;
+
+	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Gère où la camera regarde(quelle partie du monde elle va voir)
+
+	
+	shader_->use(); //Use shader
+
+	//Set la position de la lumière dans le shader
+	shader_->setVec3("light.position", posOfLight);
+	shader_->setVec3("viewPos", cameraPos);
 
 	//Pour faire tourner la camera autour de la scene
 	/*
@@ -201,15 +206,12 @@ void Renderer::draw()
 	view = glm::mat4(1.0f);
 	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
 	shader_->setMat4("view", view);//Bind la matrice dans le shader*/
+
 	//Gestion de la matrice pour la camera
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Gère où la camera regarde(quelle partie du monde elle va voir)
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
-	//Set la position de la lumière dans le shader
-	shader_->setVec3("light.position", posOfLight);
-	shader_->setVec3("viewPos", cameraPos);
 
-
+	
 	// bind Texture
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -233,6 +235,7 @@ void Renderer::draw()
 	}
 
 //-------For Light cube
+
 	lightShader_->use();
 
 	//Déplace la lumière
@@ -334,21 +337,22 @@ unsigned int Renderer::loadTexture(char const* path)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//en U
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//en V
 		//On va set la méthode d'interpolation des pixels(quand upscale ou downscale): nearest pixelise, linear blur
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		//Création des options pour les mipmaps 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		//Si on veut utiliser Clamp to border
 		//float borderColor[] = { 1.0f, 1.0f, 0.0f, 1.0f };
 		//glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
+
+		stbi_image_free(data);//On libère l'image de la mémoire
 	}
 	else
 	{
 		std::cout << "ERROR::TEXTURE of type: " << "Failed to load texture" << " Error can come from an incorrect path" << "\n -- --------------------------------------------------- -- " << std::endl;
+		stbi_image_free(data);
 	}
-	//On libère l'image de la mémoire
-	stbi_image_free(data);
 
 	return textureID;
 }
