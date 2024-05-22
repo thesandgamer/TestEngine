@@ -101,6 +101,8 @@ void Renderer::init()
 //--------------------Textures du mesh
 	char const* pathName = "resources/textures/container2.png";
 	diffuseMap = loadTexture(pathName);		//Load la texture
+	pathName = "resources/textures/container2_specular.png";
+	specularMap = loadTexture(pathName);		//Load la texture
 
 
 //////]-----------------------------[Transforms]-----------------------------[
@@ -143,7 +145,7 @@ void Renderer::init()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
 
-	//Set shaders pour le cube de lumière
+	//-------Set shaders pour le cube de lumière
 	glm::vec3 lightColor = { .5f, .5f, .5f };
 	//Set shader for light source
 	lightShader_->use();
@@ -151,28 +153,33 @@ void Renderer::init()
 	lightShader_->setMat4("view", view);
 	lightShader_->setVec3("lightColor", lightColor);
 
-	//---Set les params des shaders
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, lightPos);
+	model = glm::scale(model, glm::vec3(.2f));
+	lightShader_->setMat4("model", model);
 
-	
+
+	//---Set les params du shader des cubes
 	shader_->use();
+
+	//Set les paramètre pour la lumière
 	//ToDo: bien gérer l'ambiant et le diffuse de la lumière, car je n'ai pas trop compris
 	shader_->setVec3("light.ambient", { lightColor.x/2,lightColor.y/2,lightColor.z/2 });
 	shader_->setVec3("light.diffuse", lightColor); // darken diffuse light a bit
 	shader_->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
-	//
-	shader_->setVec3("light.position", lightPos);
-	shader_->setVec3("viewPos", cameraPos);
 
 	//To set material for cubes
 	glm::vec3 materialColor = { 1.0f, 1.0f, 1.0f };
 
-	shader_->setInt("material.diffuseTexture", 0);
+	shader_->setInt("material.diffuseTexture", 0);//Définit la texture, la value va être la valeur d'où est stoqué la texture(0/1/2...)
 	shader_->setVec3("material.color", materialColor);
-	shader_->setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+	shader_->setInt("material.specularTexture", 1);
 	shader_->setFloat("material.shininess", 64.0f);
 	
-
+	//-----------
+	shader_->setVec3("light.position", lightPos);
+	shader_->setVec3("viewPos", cameraPos);
 
 
 }
@@ -205,16 +212,36 @@ void Renderer::draw()
 	float camZ = cos(glfwGetTime()) * radius;
 	view = glm::mat4(1.0f);
 	view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
-	shader_->setMat4("view", view);//Bind la matrice dans le shader*/
+	*/
 
 	//Gestion de la matrice pour la camera
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
 
-	
-	// bind Texture
+//----------Manage objects
+
+	glm::mat4 model = glm::mat4(1.0f);
+	shader_->setMat4("model", model);
+
+	// bind diffuse map
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, diffuseMap);
+	// bind specular map
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, specularMap);
+
+	// render the cube
+	glBindVertexArray(VAO);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+
+	/*
+	//Bind la texture de diffuse à 0
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, diffuseMap);
+	//Bind la texture de specular à 1
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, specularMap);
 
 	glBindVertexArray(VAO); //Bind Vertex
 
@@ -226,13 +253,13 @@ void Renderer::draw()
 		glm::mat4 model = glm::mat4(1.0f);	//Reset car on change les valeurs
 		model = glm::translate(model, cubePositions[i]);
 		float angle = 20.0f * i;
-		//model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-		model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f*i, 0.0f));
+		model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+		//model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f*i, 0.0f));
 		model = glm::scale(model, glm::vec3(0.5, 0.5, 0.5));
 		shader_->setMat4("model", model);	//On passe la matrice de transformation  au shader
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);	//Dessine les triangles
-	}
+	}*/
 
 //-------For Light cube
 

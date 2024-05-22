@@ -40,6 +40,8 @@ private:
 	unsigned int shader_program_;
 
 	unsigned int diffuseMap;
+	unsigned int specularMap;
+
 
 	//Matrices pour
 	glm::mat4 model = glm::mat4(1.0f);	//Matrice qui controle le model par rapport au monde

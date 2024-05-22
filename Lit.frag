@@ -5,7 +5,7 @@ out vec4 FragColor;
 struct Material {
     sampler2D diffuseTexture;	//Texture pour la couleur de base
 	vec3 color;
-    vec3 specular;
+    sampler2D specularTexture;
     float shininess;
 }; 
 
@@ -31,20 +31,20 @@ uniform vec3 viewPos;       //Position de la camera
 void main()
 {
 	//Calculate ambiant color
-	vec3 ambient = light.ambient * texture(material.diffuseTexture, TexCoords).rgb * material.color ;
+	vec3 ambient = light.ambient * texture(material.diffuseTexture, TexCoords).rgb ;// * material.color ;
 
 	//Calculate diffuse
 	vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(light.position - FragPos); 
 	float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = light.diffuse * diff *  texture(material.diffuseTexture, TexCoords).rgb * material.color ;  
+    vec3 diffuse = light.diffuse * diff * texture(material.diffuseTexture, TexCoords).rgb;// * material.color ;  
 
 
 	//Calculate specular
-	vec3 viewDir = normalize(viewPos-FragPos);
+	vec3 viewDir = normalize(viewPos - FragPos);
 	vec3 reflectDir = reflect(-lightDir, norm);  
 	float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);
-    vec3 specular = light.specular * (spec * material.specular);  
+    vec3 specular = light.specular * spec * texture(material.specularTexture, TexCoords).rgb ;
 
     
 	vec3 result = (ambient + diffuse + specular);
