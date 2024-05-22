@@ -146,34 +146,34 @@ void Renderer::init()
 	glEnableVertexAttribArray(0);
 
 	//-------Set shaders pour le cube de lumière
-	glm::vec3 lightColor = { .7f, .7f, .7f };
+	glm::vec3 lightColor = { 1.0f, 1.0f, 1.0f };
 
 	glm::vec3 environementColor= { .1f, .1f, .1f };
 	//Set shader for light source
 	lightShader_->use();
 	lightShader_->setMat4("projection", projection);
 	lightShader_->setMat4("view", view);
-	lightShader_->setVec3("lightColor", lightColor);
+
 
 	model = glm::mat4(1.0f);
 	model = glm::translate(model, lightPos);
 	model = glm::scale(model, glm::vec3(.2f));
 	lightShader_->setMat4("model", model);
-
+	lightShader_->setVec3("lightColor", lightColor);
 
 	//---Set les params du shader des cubes
 	shader_->use();
 
 	//Set les paramètre pour la lumière
 	//ToDo: bien gérer l'ambiant et le diffuse de la lumière, car je n'ai pas trop compris
-	shader_->setVec3("light.diffuse", lightColor); // darken diffuse light a bit
-	shader_->setVec3("light.ambient", environementColor);
-	shader_->setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+	shader_->setVec3("pointLight.diffuse", lightColor); // darken diffuse light a bit
+	shader_->setVec3("pointLight.ambient", environementColor);
+	shader_->setVec3("pointLight.specular", 1.0f, 1.0f, 1.0f);
 
 	//Set attenuation for point light
-	shader_->setFloat("light.constant", 1.0f);
-	shader_->setFloat("light.linear", 0.09f);
-	shader_->setFloat("light.quadratic", 0.032f);
+	shader_->setFloat("pointLight.constant", 1.0f);
+	shader_->setFloat("pointLight.linear", 0.09f);
+	shader_->setFloat("pointLight.quadratic", 0.032f);
 
 
 	//To set material for cubes
@@ -185,7 +185,7 @@ void Renderer::init()
 	shader_->setFloat("material.shininess", 64);
 	
 	//-----------
-	shader_->setVec3("light.position", lightPos);
+	shader_->setVec3("pointLight.position", lightPos);
 	shader_->setVec3("viewPos", cameraPos);
 
 
@@ -211,7 +211,7 @@ void Renderer::draw()
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
 	//Set la position de la lumière dans le shader
-	shader_->setVec3("light.position", posOfLight);
+	shader_->setVec3("pointLight.position", posOfLight);
 	shader_->setVec3("viewPos", cameraPos);
 
 	//Pour faire tourner la camera autour de la scene
