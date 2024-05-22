@@ -147,6 +147,7 @@ void Renderer::init()
 
 	//-------Set shaders pour le cube de lumière
 	glm::vec3 lightColor = { .7f, .7f, .7f };
+
 	glm::vec3 environementColor= { .1f, .1f, .1f };
 	//Set shader for light source
 	lightShader_->use();
