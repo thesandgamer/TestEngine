@@ -146,7 +146,6 @@ void Renderer::init()
 	glEnableVertexAttribArray(0);
 
 	//-------Set shaders pour le cube de lumière
-	glm::vec3 lightColor = { 1.0f, 1.0f, 1.0f };
 
 	glm::vec3 environementColor= { .1f, .1f, .1f };
 	//Set shader for light source
@@ -156,10 +155,10 @@ void Renderer::init()
 
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, lightPos);
+	model = glm::translate(model, pointLightPositions[0]);
 	model = glm::scale(model, glm::vec3(.2f));
 	lightShader_->setMat4("model", model);
-	lightShader_->setVec3("lightColor", lightColor);
+	lightShader_->setVec3("lightColor", pointLightColors[0]);
 
 	//---Set les params du shader des cubes
 	shader_->use();
@@ -173,14 +172,22 @@ void Renderer::init()
 
 	//Set les paramètre pour la lumière
 	//ToDo: bien gérer l'ambiant et le diffuse de la lumière, car je n'ai pas trop compris
-	shader_->setVec3("pointLights[0].diffuse", lightColor); // darken diffuse light a bit
+	shader_->setVec3("pointLights[0].diffuse", pointLightColors[0]); // darken diffuse light a bit
 	shader_->setVec3("pointLights[0].ambient", environementColor);
 	shader_->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
+
+	shader_->setVec3("pointLights[1].diffuse", pointLightColors[1]);
+	shader_->setVec3("pointLights[1].ambient", environementColor);
+	shader_->setVec3("pointLights[1].specular", 1.0f, 1.0f, 1.0f);
 
 	//Set attenuation for point light
 	shader_->setFloat("pointLights[0].constant", 1.0f);
 	shader_->setFloat("pointLights[0].linear", 0.09f);
 	shader_->setFloat("pointLights[0].quadratic", 0.032f);
+
+	shader_->setFloat("pointLights[1].constant", 1.0f);
+	shader_->setFloat("pointLights[1].linear", 0.09f);
+	shader_->setFloat("pointLights[1].quadratic", 0.032f);
 
 
 	//To set material for cubes
@@ -192,7 +199,8 @@ void Renderer::init()
 	shader_->setFloat("material.shininess", 64);
 	
 	//-----------
-	shader_->setVec3("pointLights[0].position", lightPos);
+	shader_->setVec3("pointLights[0].position", pointLightPositions[0]);
+	shader_->setVec3("pointLights[1].position", pointLightPositions[1]);
 	shader_->setVec3("viewPos", cameraPos);
 
 
@@ -206,8 +214,8 @@ void Renderer::update(float dt)
 
 void Renderer::draw()
 {
-	//	glm::vec3 posOfLight = { lightPos.x, lightPos.y + glm::sin((float)glfwGetTime() * .5f) * 2, lightPos.z };
-	glm::vec3 posOfLight = lightPos;
+	pointLightPositions[0].y = basePos.y +  glm::sin((float)glfwGetTime() * .5f) * 2;
+	//glm::vec3 posOfLight = pointLightPositions[0];
 
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);	//Gère où la camera regarde(quelle partie du monde elle va voir)
 
@@ -218,7 +226,7 @@ void Renderer::draw()
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
 	//Set la position de la lumière dans le shader
-	shader_->setVec3("pointLights[0].position", posOfLight);
+	shader_->setVec3("pointLights[0].position", pointLightPositions[0]);
 	shader_->setVec3("viewPos", cameraPos);
 
 	//Pour faire tourner la camera autour de la scene
@@ -280,15 +288,22 @@ void Renderer::draw()
 	lightShader_->use();
 
 	//Déplace la lumière
-	model = glm::mat4(1.0f);
-	model = glm::translate(model, posOfLight);
-	model = glm::scale(model, glm::vec3(.2f));
-	lightShader_->setMat4("model", model);
+
 	lightShader_->setMat4("view", view);
 
-	//Dessine le cube de lumière
-	glBindVertexArray(lightVAO);
-	glDrawArrays(GL_TRIANGLES, 0, 36);
+	for (unsigned int i = 0; i < pointLightPositions->length()-1; i++)
+	{
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, pointLightPositions[i]);
+		model = glm::scale(model, glm::vec3(.2f));
+		lightShader_->setMat4("model", model);
+		lightShader_->setVec3("lightColor", pointLightColors[i]);
+
+		//Dessine le cube de lumière
+		glBindVertexArray(lightVAO);
+		glDrawArrays(GL_TRIANGLES, 0, 36);
+	}
+
 
 }
 

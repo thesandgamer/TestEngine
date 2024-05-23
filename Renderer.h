@@ -89,8 +89,17 @@ private:
 
 
 	//-------Lights
-	glm::vec3 lightPos = { 1.0f, 2.0f, 0.0f };
+	glm::vec3 pointLightPositions[2] = {
+	   glm::vec3(0.7f,  0.2f,  2.0f),
+	   glm::vec3(0.7f, .2f, -7.0f),
+	};
 
+	glm::vec3 basePos = pointLightPositions[0];
+
+	glm::vec3 pointLightColors[2] = {
+	   glm::vec3( 1.0f, 1.0f, 1.0f ),
+	   glm::vec3(1.0f, .5f, .5f),
+	};
 	//----------
 	float deltaTime = 0.0f;
 
