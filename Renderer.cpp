@@ -150,7 +150,7 @@ void Renderer::init()
 
 	glm::vec3 environementColor= { .1f, .1f, .1f };
 	//Set shader for light source
-	lightShader_->use();
+	lightShader_->use();	
 	lightShader_->setMat4("projection", projection);
 	lightShader_->setMat4("view", view);
 
