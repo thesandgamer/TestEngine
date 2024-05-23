@@ -164,16 +164,23 @@ void Renderer::init()
 	//---Set les params du shader des cubes
 	shader_->use();
 
+	// directional light
+	/*
+	shader_->setVec3("dirLight.direction", -0.2f, -1.0f, -0.3f);
+	shader_->setVec3("dirLight.ambient", 0.05f, 0.05f, 0.05f);
+	shader_->setVec3("dirLight.diffuse", 0.4f, 0.4f, 0.4f);
+	shader_->setVec3("dirLight.specular", 0.5f, 0.5f, 0.5f);*/
+
 	//Set les paramètre pour la lumière
 	//ToDo: bien gérer l'ambiant et le diffuse de la lumière, car je n'ai pas trop compris
-	shader_->setVec3("pointLight.diffuse", lightColor); // darken diffuse light a bit
-	shader_->setVec3("pointLight.ambient", environementColor);
-	shader_->setVec3("pointLight.specular", 1.0f, 1.0f, 1.0f);
+	shader_->setVec3("pointLights[0].diffuse", lightColor); // darken diffuse light a bit
+	shader_->setVec3("pointLights[0].ambient", environementColor);
+	shader_->setVec3("pointLights[0].specular", 1.0f, 1.0f, 1.0f);
 
 	//Set attenuation for point light
-	shader_->setFloat("pointLight.constant", 1.0f);
-	shader_->setFloat("pointLight.linear", 0.09f);
-	shader_->setFloat("pointLight.quadratic", 0.032f);
+	shader_->setFloat("pointLights[0].constant", 1.0f);
+	shader_->setFloat("pointLights[0].linear", 0.09f);
+	shader_->setFloat("pointLights[0].quadratic", 0.032f);
 
 
 	//To set material for cubes
@@ -185,7 +192,7 @@ void Renderer::init()
 	shader_->setFloat("material.shininess", 64);
 	
 	//-----------
-	shader_->setVec3("pointLight.position", lightPos);
+	shader_->setVec3("pointLights[0].position", lightPos);
 	shader_->setVec3("viewPos", cameraPos);
 
 
@@ -211,7 +218,7 @@ void Renderer::draw()
 	shader_->setMat4("view", view);//Bind la matrice dans le shader
 
 	//Set la position de la lumière dans le shader
-	shader_->setVec3("pointLight.position", posOfLight);
+	shader_->setVec3("pointLights[0].position", posOfLight);
 	shader_->setVec3("viewPos", cameraPos);
 
 	//Pour faire tourner la camera autour de la scene
