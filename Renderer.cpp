@@ -205,7 +205,7 @@ void Renderer::init()
 
 
 }
-
+ 
 void Renderer::update(float dt)
 {
 	deltaTime = dt;
