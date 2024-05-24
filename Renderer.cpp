@@ -9,11 +9,15 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 void Renderer::init()
 {
 	shader_ = std::make_unique<Shader>("Lit.vert", "Lit.frag");
 	lightShader_ = std::make_unique<Shader>("Light.vert", "Light.frag");
-
 
 //////]-----------------------------[Données du mesh]-----------------------------[
 	//Coorodonées des points en local de l'objet
