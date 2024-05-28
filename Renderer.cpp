@@ -16,6 +16,8 @@
 
 void Renderer::init()
 {
+	backPack = std::make_unique<Model>("resources/Objects/BackPack/backpack.obj");
+
 	shader_ = std::make_unique<Shader>("Lit.vert", "Lit.frag");
 	lightShader_ = std::make_unique<Shader>("Light.vert", "Light.frag");
 
@@ -261,7 +263,13 @@ void Renderer::draw()
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	*/
 
-	
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));	// it's a bit too big for our scene, so scale it down
+	shader_->setMat4("model", model);	//On passe la matrice de transformation  au shader
+
+
+	backPack->Draw(*shader_.get());
+	/*
 	//Bind la texture de diffuse à 0
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, diffuseMap);
@@ -286,7 +294,7 @@ void Renderer::draw()
 
 		glDrawArrays(GL_TRIANGLES, 0, 36);	//Dessine les triangles
 	}
-
+	*/
 //-------For Light cube
 
 	lightShader_->use();

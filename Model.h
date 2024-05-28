@@ -9,12 +9,12 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
-unsigned int TextureFromFile(const char* path, const string& directory, bool gamma = false);
+static unsigned int TextureFromFile(const char* path, const string& directory, bool gamma = false);
 
 class Model
 {
 public:
-    Model(char* path);
+    Model(const char* path);
     void Draw(Shader& shader);
 
 private:

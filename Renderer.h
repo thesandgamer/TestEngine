@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Shader.h"
+#include "Model.h"
 
 enum RenderMode
 {
@@ -86,6 +87,7 @@ private:
 
 	float fov = 45.0f;
 
+	std::unique_ptr<Model> backPack;
 
 
 	//-------Lights

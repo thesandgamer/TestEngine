@@ -2,7 +2,7 @@
 
 #include "stb_image.h"
 
-Model::Model(char* path)
+Model::Model(const char* path)
 {
     loadModel(path);
 }
@@ -79,16 +79,18 @@ Mesh Model::processMesh(aiMesh* mesh, const aiScene* scene)
             vec.x = mesh->mTextureCoords[0][i].x;
             vec.y = mesh->mTextureCoords[0][i].y;
             vertex.TexCoords = vec;
+            /*
             // tangent
             vector.x = mesh->mTangents[i].x;
             vector.y = mesh->mTangents[i].y;
             vector.z = mesh->mTangents[i].z;
             vertex.Tangent = vector;
+
             // bitangent
             vector.x = mesh->mBitangents[i].x;
             vector.y = mesh->mBitangents[i].y;
             vector.z = mesh->mBitangents[i].z;
-            vertex.Bitangent = vector;
+            vertex.Bitangent = vector;*/
         }
         else   {vertex.TexCoords = glm::vec2(0.0f, 0.0f);}
 
@@ -174,7 +176,7 @@ unsigned int TextureFromFile(const char* path, const string& directory, bool gam
     unsigned int textureID;
 
     //Génère la texture
-    glGenTextures(1, &textureID);//Combien de texture on veut créer et où on les stoques
+    glGenTextures(1, &textureID);//Combien de texture on veut créer et où on les stock
 
     //Load image grâce à stb image
     int width, height, nrComponents;

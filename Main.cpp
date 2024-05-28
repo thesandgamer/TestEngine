@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "Renderer.h"
+#include "stb_image.h"
 
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
@@ -61,6 +62,8 @@ int main(int, char**)
     //Enable callback pour scroll de la souris
     glfwSetScrollCallback(window, scroll_callback);
 
+    // tell stb_image.h to flip loaded texture's on the y-axis (before loading model).
+    stbi_set_flip_vertically_on_load(true);
     glEnable(GL_DEPTH_TEST);
 
 
