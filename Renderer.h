@@ -31,7 +31,7 @@ public:
 	unsigned int loadTexture(char const* path);
 
 private:
-	unsigned int VBO;	//Créer un ID pour le vertex buffer
+	unsigned int VBO;
 	unsigned int VAO;
 	unsigned int EBO;
 

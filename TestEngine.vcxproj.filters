@@ -57,6 +57,12 @@
       <Filter>Engine</Filter>
     </ClCompile>
     <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Engine\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="Model.cpp">
+      <Filter>Engine\Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="imgui\imgui.h">
@@ -76,6 +82,12 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Mesh.h">
+      <Filter>Engine\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Model.h">
+      <Filter>Engine\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Lit.frag">

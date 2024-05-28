@@ -397,8 +397,8 @@ unsigned int Renderer::loadTexture(char const* path)
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);//en U
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);//en V
 		//On va set la méthode d'interpolation des pixels(quand upscale ou downscale): nearest pixelise, linear blur
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		//Création des options pour les mipmaps 
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -410,7 +410,7 @@ unsigned int Renderer::loadTexture(char const* path)
 	}
 	else
 	{
-		std::cout << "ERROR::TEXTURE of type: " << "Failed to load texture" << " Error can come from an incorrect path" << "\n -- --------------------------------------------------- -- " << std::endl;
+		std::cout << "ERROR::TEXTURE: " << "Failed to load texture" << " Error can come from an incorrect path" << "\n -- --------------------------------------------------- -- " << std::endl;
 		stbi_image_free(data);
 	}
 
